@@ -488,20 +488,6 @@ ORDER BY year, month;
 
 
 
-### Interview Talking Point
-
-For data engineering interviews:
-
-> I added Metabase as a BI layer on top of the PostgreSQL warehouse. Airflow and Spark
-> build the star schema, and Metabase lets business users analyze the curated warehouse
-> tables without querying raw files directly.
-
-For data analytics interviews:
-
-> I built an ecommerce analytics dashboard showing revenue, orders, monthly trends,
-> product performance, category performance, and inventory status using SQL on top of
-> the warehouse tables.
-
 ---
 
 ## What I'd improve with more time
