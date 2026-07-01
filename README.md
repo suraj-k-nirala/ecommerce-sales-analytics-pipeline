@@ -7,7 +7,9 @@
 ![Docker](https://img.shields.io/badge/Docker-Compose-lightblue)
 ![Metabase](https://img.shields.io/badge/Metabase-Latest-509EE3)
 
-An end-to-end ecommerce analytics project built on the Brazilian Olist dataset (100k+ real orders). It ingests data from 3 sources (CSV files, PostgreSQL, REST API), transforms and validates it using Apache Spark, builds a star schema data warehouse, and surfaces business insights — revenue trends, category performance, inventory status — through a Metabase analytics dashboard. The entire pipeline is orchestrated and scheduled by Apache Airflow.
+An end-to-end ecommerce analytics pipeline built on the Brazilian Olist dataset (100k+ real orders from 2016–2018).
+
+Ingests data from 3 sources — CSV files, PostgreSQL, and a REST API — cleans and validates it using Apache Spark, builds a star schema data warehouse, and delivers business insights through a Metabase analytics dashboard. Revenue trends, category performance, and inventory status are all queryable from a single warehouse. The entire pipeline runs on a daily schedule orchestrated by Apache Airflow, with incremental loads, data quality checks, and partitioned Parquet storage at each stage.
 
 ---
 
