@@ -1,3 +1,40 @@
+# =============================================================
+# raw_to_staging.py
+# =============================================================
+# Cleans all 7 raw datasets and writes them to staging as Parquet.
+#
+# Every cleaning decision below is based on profiling findings from
+# jobs/profiling/profile_raw_data.py. Run that script first to see
+# the full profiling output saved in profiling_results.txt.
+#
+# Key profiling findings that shaped this file:
+#
+# customers        : 0 nulls, 0 duplicates on customer_id
+#                    email and signup_date columns missing entirely → derived
+#
+# orders           : 0 nulls on order_id and customer_id (join keys)
+#                    order_purchase_timestamp dtype=object (string) → cast to date
+#                    delivery date nulls are expected (undelivered orders) → kept
+#
+# products         : 0 duplicates on product_id
+#                    product_category_name has 610 nulls → kept, product_id still valid
+#                    price column missing entirely → derived from order_items avg price
+#
+# order_items      : 0 nulls, 0 duplicates → cleanest dataset
+#
+# sellers          : 0 nulls, 0 duplicates on seller_id
+#
+# inventory        : 0 nulls, 0 duplicates on product_id
+#                    last_updated dtype=object (string) → cast to date
+#
+# product_metadata : brand has 15 nulls → kept, brand is optional enrichment
+#                    column named 'id' not 'product_id' → renamed to match schema
+#
+# dropDuplicates and isNotNull filters are applied on all datasets
+# as defensive coding — pipeline runs daily and cannot guarantee
+# every future batch will be as clean as the current data.
+# =============================================================
+
 import os
 import shutil
 import logging
@@ -13,7 +50,7 @@ spark = (
     .getOrCreate()
 )
 
-RAW_CSV_PATH = "/app/data/raw/csv"
+RAW_CSV_PATH = "/app/data/raw/csv_ingested"
 RAW_DB_PATH = "/app/data/raw/db"
 RAW_API_PATH = "/app/data/raw/api"
 STAGING_PATH = "/app/data/staging"

@@ -10,14 +10,15 @@ API_URL = "https://dummyjson.com/products"
 OUTPUT_DIR = "/app/data/raw/api"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-response = requests.get(API_URL)
-
-if response.status_code == 200:
+try:
+    response = requests.get(API_URL, timeout=30)
+    response.raise_for_status()
     data = response.json()
     products = data["products"]
     df = pd.DataFrame(products)
     output_path = os.path.join(OUTPUT_DIR, "product_metadata.csv")
     df.to_csv(output_path, index=False)
     logger.info(f"API extraction completed successfully. {len(df)} products saved.")
-else:
-    logger.error(f"Failed to fetch data from API. Status code: {response.status_code}")
+except requests.exceptions.RequestException as e:
+    logger.error(f"API extraction failed: {e}")
+    raise

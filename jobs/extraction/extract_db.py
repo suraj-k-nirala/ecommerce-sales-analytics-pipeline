@@ -7,18 +7,29 @@ from datetime import datetime
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-DB_HOST = os.getenv("DB_HOST", "ecommerce_postgres")
-DB_PORT = os.getenv("DB_PORT", "5432")
-DB_NAME = os.getenv("POSTGRES_DB", "ecommerce_dw")
-DB_USER = os.getenv("POSTGRES_USER", "admin")
-DB_PASS = os.getenv("POSTGRES_PASSWORD", "admin123")
+# Read database configuration from environment variables
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("POSTGRES_DB")
+DB_USER = os.getenv("POSTGRES_USER")
+DB_PASS = os.getenv("POSTGRES_PASSWORD")
 
+# Validate that all required database configurations are available
+if not (DB_HOST and DB_PORT and DB_NAME and DB_USER and DB_PASS):
+    raise RuntimeError("Database configuration must be provided via environment variables")
+
+# Create PostgreSQL database connection
 engine = create_engine(
     f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 )
 
+# Define output directory for extracted raw database files
 OUTPUT_PATH = "/app/data/raw/db"
+
+# Define file path used to store the last successful extraction timestamp
 WATERMARK_FILE = "/app/data/raw/db/.watermark"
+
+# Create output directory if it does not already exist
 os.makedirs(OUTPUT_PATH, exist_ok=True)
 
 # Read last watermark
@@ -30,7 +41,7 @@ else:
     last_updated = "1900-01-01"
     logger.info("No watermark found, doing full load")
 
-# Extract tables
+# Extracting Data From PostgreSQL
 sellers_df = pd.read_sql("SELECT * FROM sellers", engine)
 inventory_df = pd.read_sql(
     f"SELECT * FROM inventory WHERE last_updated > '{last_updated}'", engine

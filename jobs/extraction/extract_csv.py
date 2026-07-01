@@ -4,7 +4,7 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-#  Use ABSOLUTE paths inside container
+#  USE ABSOLUTE paths inside container
 SOURCE_PATH = "/app/data/raw/csv"
 TARGET_PATH = "/app/data/raw/csv_ingested"
 

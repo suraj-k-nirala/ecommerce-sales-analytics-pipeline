@@ -1,3 +1,18 @@
+# =============================================================
+# staging_to_processed.py
+# =============================================================
+# Reads all 7 cleaned staging datasets and builds a star schema:
+#
+#   dim_customers  — from staging/customers
+#   dim_sellers    — from staging/sellers
+#   dim_products   — enriched from staging/products + inventory + product_metadata
+#   fact_sales     — joined from staging/order_items + orders
+#                    partitioned by year and month
+#
+# All outputs written to /data/processed/ as Parquet.
+# fact_sales is partitioned by year/month for faster analytical queries.
+# =============================================================
+
 import os
 import shutil
 import logging
@@ -36,7 +51,7 @@ dim_customers = customers.select("customer_id", "customer_name", "email", "signu
 
 dim_sellers = sellers.select("seller_id", "seller_name", "city", "state")
 
-selected_metadata_cols = [c for c in ["product_id", "brand", "rating", "stock", "category"] if c in product_metadata.columns]
+selected_metadata_cols = [c for c in ["product_id", "brand", "rating", "stock", "category", "api_category"] if c in product_metadata.columns]
 product_metadata_clean = product_metadata.select(*selected_metadata_cols)
 if "category" in product_metadata_clean.columns:
     product_metadata_clean = product_metadata_clean.withColumnRenamed("category", "api_category")

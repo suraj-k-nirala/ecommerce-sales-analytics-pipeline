@@ -1,9 +1,12 @@
 import pandas as pd
 import random
+import os
 
-sellers_df = pd.read_csv(r"D:\olist-dataset\olist_sellers_dataset.csv")
-products_df = pd.read_csv(r"D:\olist-dataset\olist_products_dataset.csv")
-order_items_df = pd.read_csv(r"D:\olist-dataset\olist_order_items_dataset.csv")
+RAW_CSV_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "raw", "csv")
+
+sellers_df = pd.read_csv(os.path.join(RAW_CSV_DIR, "sellers.csv"))
+products_df = pd.read_csv(os.path.join(RAW_CSV_DIR, "products.csv"))
+order_items_df = pd.read_csv(os.path.join(RAW_CSV_DIR, "order_items.csv"))
 
 # Get unique product_ids from order_items
 unique_products = order_items_df["product_id"].unique()[:500]  # limit to 500
@@ -55,7 +58,8 @@ for product_id in unique_products:
 sql += ",\n".join(rows) + ";\n"
 
 # Write to file
-with open(r"D:\ecommerce-sales-batch-pipeline-v2\sql\source_db_init.sql", "w", encoding="utf-8") as f:
+output_path = os.path.join(os.path.dirname(__file__), "source_db_init.sql")
+with open(output_path, "w", encoding="utf-8") as f:
     f.write(sql)
 
 print("SQL file generated successfully!")

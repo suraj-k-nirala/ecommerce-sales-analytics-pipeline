@@ -18,6 +18,12 @@ services:
     image: spark:3.5.1
     container_name: ecommerce_spark
     user: root
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - .:/app
     depends_on:
@@ -35,13 +41,22 @@ services:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
     volumes:
       - ./dags:/opt/airflow/dags
       - .:/app
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "8080:8080"
-    command: webserver
+    command: >-
+      bash -c "
+      sed -i 's/from datetime import datetime/from datetime import datetime, timezone/g' /home/airflow/.local/lib/python3.12/site-packages/flask_session/sessions.py &&
+      sed -i 's/datetime.utcnow()/datetime.now(timezone.utc)/g' /home/airflow/.local/lib/python3.12/site-packages/flask_session/sessions.py &&
+      airflow db migrate &&
+      psql postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB} -c 'DELETE FROM session;' || true &&
+      airflow webserver
+      "
 
   airflow-scheduler:
     image: apache/airflow:2.9.3
@@ -53,11 +68,32 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
     volumes:
       - ./dags:/opt/airflow/dags
       - .:/app
       - /var/run/docker.sock:/var/run/docker.sock
-    command: scheduler
+    command: bash -c "airflow db migrate && airflow scheduler"
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: ecommerce_metabase
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    volumes:
+      - metabase_data:/metabase-data
+    environment:
+      MB_DB_FILE: /metabase-data/metabase.db
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: ${POSTGRES_DB}
+      MB_DB_PORT: 5432
+      MB_DB_USER: ${POSTGRES_USER}
+      MB_DB_PASS: ${POSTGRES_PASSWORD}
+      MB_DB_HOST: postgres
 
 volumes:
   postgres_data:
+  metabase_data:

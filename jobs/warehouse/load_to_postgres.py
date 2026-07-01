@@ -9,11 +9,16 @@ spark = SparkSession.builder.appName("LoadToPostgres").getOrCreate()
 
 PROCESSED_PATH = "/app/data/processed"
 
-DB_USER = os.getenv("POSTGRES_USER", "admin")
-DB_PASS = os.getenv("POSTGRES_PASSWORD", "admin123")
-DB_NAME = os.getenv("POSTGRES_DB", "ecommerce_dw")
+# Read database configuration from environment variables
+DB_USER = os.getenv("POSTGRES_USER")
+DB_PASS = os.getenv("POSTGRES_PASSWORD")
+DB_NAME = os.getenv("POSTGRES_DB")
 
-jdbc_url = f"jdbc:postgresql://ecommerce_postgres:5432/{DB_NAME}"
+# Validate that all required database configurations are available
+if not (DB_USER and DB_PASS and DB_NAME):
+    raise RuntimeError("Database configuration must be provided via environment variables")
+
+jdbc_url = f"jdbc:postgresql://postgres:5432/{DB_NAME}"
 connection_properties = {
     "user": DB_USER,
     "password": DB_PASS,
