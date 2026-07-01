@@ -1,4 +1,4 @@
-# Ecommerce Sales Batch Pipeline
+# Ecommerce Sales Analytics Pipeline
 
 ![Python](https://img.shields.io/badge/Python-3.8-blue)
 ![Airflow](https://img.shields.io/badge/Airflow-2.9.3-green)
@@ -7,11 +7,7 @@
 ![Docker](https://img.shields.io/badge/Docker-Compose-lightblue)
 ![Metabase](https://img.shields.io/badge/Metabase-Latest-509EE3)
 
-A batch data pipeline I built to simulate a real-world ecommerce data engineering workflow. It ingests data from 3 different sources (CSV files, PostgreSQL, REST API), transforms and validates it using Apache Spark, builds a star schema, and loads it into a PostgreSQL data warehouse — all orchestrated and scheduled by Apache Airflow.
-
-I used the **Brazilian Olist E-Commerce dataset** (100k+ real orders) as the data source because it closely mirrors real-world ecommerce data with multiple related entities, realistic dirty data, and meaningful business metrics.
-
-I built this to get hands-on experience with the kind of pipeline you'd actually see in a data engineering role — not just moving data around, but handling multiple sources, incremental loads, data quality checks, partitioned storage, and proper logging.
+An end-to-end ecommerce analytics project built on the Brazilian Olist dataset (100k+ real orders). It ingests data from 3 sources (CSV files, PostgreSQL, REST API), transforms and validates it using Apache Spark, builds a star schema data warehouse, and surfaces business insights — revenue trends, category performance, inventory status — through a Metabase analytics dashboard. The entire pipeline is orchestrated and scheduled by Apache Airflow.
 
 ---
 
