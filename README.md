@@ -131,9 +131,9 @@ Every day Airflow triggers the pipeline which:
 
 ```
                     ┌─────────────────────────────────────┐
-                    │        ecommerce_batch_pipeline      │
-                    │        schedule: @daily              │
-                    │        retries: 1 (after 5 mins)     │
+                    │        ecommerce_analytics_pipeline │
+                    │        schedule: @daily             │
+                    │        retries: 1 (after 5 mins)    │
                     └─────────────────────────────────────┘
 
   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
@@ -175,7 +175,7 @@ Every day Airflow triggers the pipeline which:
 ## Project Structure
 
 ```
-ecommerce-sales-batch-pipeline/
+ecommerce-sales-analytics-pipeline/
 ├── dags/
 │   └── ecommerce_batch_pipeline.py   # Airflow DAG — defines task flow and schedule
 ├── jobs/
@@ -292,7 +292,7 @@ the pipeline runs daily and cannot guarantee every future batch will be as clean
 **1. Clone the repo**
 ```bash
 git clone <repo-url>
-cd ecommerce-sales-batch-pipeline
+cd ecommerce-sales-analytics-pipeline
 ```
 
 **2. Create your `.env` file**
@@ -484,12 +484,27 @@ GROUP BY year, month
 ORDER BY year, month;
 ```
 
+---
 
+## Key Business Insights
+
+These insights are derived directly from the warehouse tables using Metabase:
+
+| Insight | Finding |
+|---|---|
+| **Total Revenue** | R$ 13.6M+ across 112,650 orders (2016–2018) |
+| **Peak Sales Period** | November–December consistently highest — clear seasonality |
+| **Top Category** | Health & Beauty (`beleza_saude`) leads all categories in revenue |
+| **Order Growth** | 2017 was the strongest year — 3× more orders than 2016 |
+| **Average Order Value** | ~R$ 120 per order |
+| **Seller Distribution** | São Paulo state accounts for majority of all sellers |
+| **Inventory** | Majority of products show UNKNOWN stock — inventory coverage limited to 500 products |
+
+These insights are visible directly in the Metabase dashboard after running the pipeline.
 
 ---
 
-## What I'd improve with more time
-
+## What I'd Improve with More Time
 
 - Replace file-based watermark with a proper metadata table in PostgreSQL — more reliable and queryable
 - Add schema validation (check column types, not just nulls)
